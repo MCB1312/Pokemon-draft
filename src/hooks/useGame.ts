@@ -36,11 +36,12 @@ export function useGame(allowedIds: number[], mode: GameMode) {
     if (score > best) setBest(score);
   }, [score, best, setBest]);
 
-  // optimal for this deal (max or min depending on mode)
+  // optimal for this deal (max or min depending on mode) + mapping stat -> mon info
   const optimalResult = useMemo(() => {
     if (!team) return null;
     let bestSum = mode === "minimal" ? Number.POSITIVE_INFINITY : -1;
     let bestAssign: StatKey[] = STATS;
+
     for (const perm of permutations(STATS)) {
       let s = 0;
       for (let i = 0; i < 6; i++) s += team[i].stats[perm[i]];
@@ -50,7 +51,25 @@ export function useGame(allowedIds: number[], mode: GameMode) {
         bestAssign = perm as StatKey[];
       }
     }
-    return { value: bestSum, assign: bestAssign };
+
+    // Build byStat map: for each stat, which mon (from index i) uses it in the optimal assignment
+    const byStat: Record<
+      StatKey,
+      { monId: number; name: string; sprite: string | null; value: number }
+    > = {} as any;
+
+    for (let i = 0; i < 6; i++) {
+      const stat = bestAssign[i];
+      const mon = team[i];
+      byStat[stat] = {
+        monId: mon.id,
+        name: mon.name,
+        sprite: mon.sprite,
+        value: mon.stats[stat],
+      };
+    }
+
+    return { value: bestSum, assign: bestAssign, byStat };
   }, [team, mode]);
 
   async function dealTeam() {

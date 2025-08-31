@@ -2,10 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { GenToggles } from "./components/GenToggles";
 import { PokemonCard } from "./components/PokemonCard";
 import { UsedStatsBar } from "./components/UsedStatsBar";
+import { BestComboPanel } from "./components/BestComboPanel";
+import { OnboardModal } from "./components/OnboardModal";
 import { idsFromEnabledGens, useGame } from "./hooks/useGame";
 import { MODE_LABEL } from "./types";
 import type { GameMode } from "./types";
-
 
 export default function App() {
   // dark mode palette
@@ -80,6 +81,9 @@ export default function App() {
           "ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial",
       }}
     >
+      {/* one-time onboarding modal */}
+      <OnboardModal palette={palette} />
+
       <header style={{ display: "grid", gap: 8, marginBottom: 12 }}>
         <h1 style={{ margin: 0 }}>Pokémon Stat Draft</h1>
 
@@ -202,6 +206,7 @@ export default function App() {
               used={usedStats}
               revealAll={false} // only picked stat shows number
               palette={palette}
+              bestByStat={undefined}
             />
           </>
         ) : (
@@ -214,10 +219,16 @@ export default function App() {
               used={usedStats}
               revealAll={allChosen} // reveal all after finishing
               palette={palette}
+              bestByStat={optimalResult?.byStat}
             />
           ))
         )}
       </main>
+
+      {/* Best combo panel after a round (clean, global view) */}
+      {allChosen && optimalResult?.byStat && (
+        <BestComboPanel byStat={optimalResult.byStat} palette={palette} />
+      )}
 
       <footer
         style={{
@@ -229,7 +240,7 @@ export default function App() {
       >
         {allChosen ? (
           <div>
-            ✅ All six chosen. Your total:{" "}
+            ✅ Runde fertig. Deine Summe:{" "}
             <strong style={{ color: palette.text }}>{score}</strong>
           </div>
         ) : team ? (

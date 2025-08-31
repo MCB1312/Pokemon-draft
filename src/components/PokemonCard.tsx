@@ -2,7 +2,6 @@ import React from "react";
 import { STATS, STAT_LABEL } from "../types";
 import type { Mon, StatKey } from "../types";
 
-
 export function PokemonCard({
   mon,
   chosen,
@@ -10,6 +9,7 @@ export function PokemonCard({
   used,
   revealAll,
   palette,
+  bestByStat,
 }: {
   mon: Mon;
   chosen: StatKey | null;
@@ -17,6 +17,10 @@ export function PokemonCard({
   used: Set<StatKey>;
   revealAll: boolean;
   palette: any;
+  bestByStat?: Record<
+    StatKey,
+    { monId: number; name: string; sprite: string | null; value: number }
+  >;
 }) {
   return (
     <div
@@ -62,30 +66,60 @@ export function PokemonCard({
       <div style={{ marginTop: 12 }}>
         {STATS.map((s) => {
           const picked = chosen === s;
-          const alreadyUsedElsewhere = used.has(s) && !picked;
+          const alreadyUsed = used.has(s); // global verwendet?
           const showNumber = revealAll || picked; // delayed reveal
+          const isOptimalHere =
+            revealAll && bestByStat && bestByStat[s]?.monId === mon.id;
+
+          const showBar = alreadyUsed;
+          const barColor = picked ? palette.primary : palette.danger;
+
           return (
             <button
               key={s}
               onClick={() => onPick(s)}
               aria-pressed={picked}
-              title={alreadyUsedElsewhere ? "This stat is already used" : STAT_LABEL[s]}
+              title={
+                alreadyUsed && !picked
+                  ? "This stat is already used"
+                  : STAT_LABEL[s]
+              }
               style={{
+                position: "relative",      // ⟵ wichtig
+                overflow: "hidden",        // ⟵ rundungen clippen den Balken
                 width: "100%",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 gap: 10,
-                padding: "10px 12px",
+                padding: "10px 12px 10px 20px", // ⟵ etwas mehr links
                 marginTop: 8,
+                minHeight: 44,             // ⟵ genug Höhe, damit Balken sichtbar wirkt
                 borderRadius: 12,
                 border: `1px solid ${picked ? palette.primary : palette.border}`,
                 background: palette.soft,
                 color: palette.text,
                 boxShadow: picked ? `inset 0 0 0 2px ${palette.primary}` : undefined,
                 cursor: "pointer",
+                opacity: alreadyUsed && !picked ? 0.95 : 1,
               }}
             >
+              {showBar && (
+                <span
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    height: "100%",
+                    width: 12,            // ⟵ breiter Balken
+                    background: barColor,
+                    zIndex: 1,            // ⟵ unter Inhalt, aber über Background
+                    pointerEvents: "none",
+                  }}
+                />
+              )}
+
               <span
                 style={{
                   minWidth: 36,
@@ -96,13 +130,43 @@ export function PokemonCard({
                   borderRadius: 999,
                   border: `1px solid ${palette.border}`,
                   background: palette.soft,
+                  position: "relative",
+                  zIndex: 2,             // ⟵ über dem Balken
                 }}
               >
                 {STAT_LABEL[s]}
               </span>
-              <span style={{ fontVariantNumeric: "tabular-nums", fontWeight: 700 }}>
+
+              <span
+                style={{
+                  fontVariantNumeric: "tabular-nums",
+                  fontWeight: 700,
+                  position: "relative",
+                  zIndex: 2,
+                }}
+              >
                 {showNumber ? mon.stats[s] : "??"}
               </span>
+
+              {isOptimalHere && (
+                <span
+                  style={{
+                    position: "absolute",
+                    right: 8,
+                    top: 8,
+                    fontSize: 10,
+                    padding: "2px 6px",
+                    borderRadius: 999,
+                    border: `1px solid ${palette.border}`,
+                    background: palette.card,
+                    opacity: 0.9,
+                    zIndex: 3,
+                  }}
+                  title="Part of optimal combo"
+                >
+                  ✓ OPT
+                </span>
+              )}
             </button>
           );
         })}
