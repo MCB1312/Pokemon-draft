@@ -23,10 +23,10 @@ export function BestComboPanel({
         background: palette.card,
       }}
     >
-      <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 8 }}>
-        <div style={{ fontWeight: 700 }}>{title}</div>
-        <div style={{ opacity: 0.8 }}>— {totalValue} pts</div>
-      </div>
+     <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 8 }}>
+  <div style={{ fontWeight: 700 }}>{title}</div>
+  <div style={{ opacity: 0.8 }}>— {Number.isFinite(totalValue) ? totalValue : 0} pts</div>
+</div>
 
       <div style={{ display: "grid", gap: 8 }}>
         {STATS.map((s) => {

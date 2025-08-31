@@ -225,10 +225,16 @@ export default function App() {
         )}
       </main>
 
-      {/* Best combo panel after a round (clean, global view) */}
-      {allChosen && optimalResult?.byStat && (
-        <BestComboPanel byStat={optimalResult.byStat} palette={palette} />
-      )}
+      {/* Best combo panel after a round */}
+{allChosen && optimalResult?.byStat && (
+  <BestComboPanel
+    byStat={optimalResult.byStat}
+    totalValue={Number.isFinite(optimalResult.value) ? optimalResult.value : 0}
+    palette={palette}
+  />
+)}
+
+
 
       <footer
         style={{
