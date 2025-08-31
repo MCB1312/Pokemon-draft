@@ -1,4 +1,5 @@
-import { Mon, StatKey } from "../types";
+import type { Mon, StatKey } from "../types";
+
 
 export async function fetchMon(id: number): Promise<Mon> {
   const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
