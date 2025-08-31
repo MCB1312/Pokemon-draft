@@ -1,4 +1,3 @@
-import React from "react";
 import { GENS } from "../types";
 
 export function GenToggles({

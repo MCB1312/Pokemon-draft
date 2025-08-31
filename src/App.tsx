@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GenToggles } from "./components/GenToggles";
 import { PokemonCard } from "./components/PokemonCard";
 import { UsedStatsBar } from "./components/UsedStatsBar";

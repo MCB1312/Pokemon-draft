@@ -1,4 +1,3 @@
-import React from "react";
 import { STATS, STAT_LABEL } from "../types";
 import type { Mon, StatKey } from "../types";
 
